@@ -33,7 +33,7 @@ routes = [
     Route("/info", endpoint=info)
 ]
 
-app = Starlette(debug=True, routes=routes, reload=True)
+app = Starlette(debug=True, routes=routes)
 app.mount('/static', StaticFiles(directory='statics'), name='static')
 if __name__ == "__main__":
     uvicorn.run(app, host='0.0.0.0', port=8000)
