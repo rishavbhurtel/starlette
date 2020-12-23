@@ -5,9 +5,15 @@
   <div class="jumbotron">
     <div class="container">
       <h3><u>Information</u></h3>
-      <p>Name: {{Name|upper}}</p>
-      <p>Id: {{Id}}</p>
-      <p>Address: {{Address}}</p>
+      
+      {% for i in infos %}
+
+        <strong>ID:</strong> {{ i.id }}
+        <strong>Name:</strong> {{ i.name }}
+        <strong>Address:</strong> {{ i.address }}
+      {% endfor %}
+
+
     </div>
   </div>
 

@@ -11,31 +11,31 @@ from sqlalchemy import Table, select
 
 templates = Jinja2Templates(directory='templates')
 
-def get_items(table_name, item_type, limit=20):
+def get_items(table_name, item_type, limit=10):
     db, metadata = get_db()
     table = Table(table_name, metadata, autoload=True, autoload_with=db)
     sql = select([table])
     items = [item_type(item) for item in db.execute(sql).fetchmany(limit)]
     return items
 
-def get_item(table_name, item_type, item_id):
-    db, metadata = get_db()
-    infos_table = Table(table_name, metadata, autoload=True, autoload_with=db)
-    sql = select([infos_table]).where(infos_table.c.id == item_id)
+# def get_item(table_name, item_type, item_id):
+#     db, metadata = get_db()
+#     infos_table = Table(table_name, metadata, autoload=True, autoload_with=db)
+#     sql = select([infos_table]).where(infos_table.c.id == item_id)
 
-    info = item_type(db.execute(sql).fetchone())
+#     info = item_type(db.execute(sql).fetchone())
 
-    if info:
-        return info
+#     if info:
+#         return info
 
-    raise Exception('Info not found.')
+#     raise Exception('Info not found.')
 
 def get_info(info_id):
     db, metadata = get_db()
     infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
     sql = select([infos_table]).where(infos_table.c.id == info_id)
 
-    info = db.execute(sql).fetchone()
+    info = db.execute(sql)
 
     if info:
         return info
@@ -53,17 +53,10 @@ async def homepage(request):
 async def info(request):
     if request.path_params:
         user_id = request.path_params['user_id']
-        if user_id == 1:
-            #return JSONResponse({'Name': "Rishav", "Id": user_id, "Address": "Kathmandu"})
-            return templates.TemplateResponse('info.html',{'request':request,
-                                                            'Name': "Rishav",
-                                                            "Id": user_id,
-                                                            "Address": "Kathmandu"})
-        else:
-            return templates.TemplateResponse( 'info.html',{'request':request,
-                                                            'Name': "Unknown",
-                                                            "Id": user_id,
-                                                            "Address": "Unknown"})
+        r_infos = get_info(user_id)
+        #return JSONResponse({'Name': "Rishav", "Id": user_id, "Address": "Kathmandu"})
+        return templates.TemplateResponse('info.html',{'request':request,
+                                                        'infos': r_infos})
     else:
         return PlainTextResponse("No parameter. Please Enter Id number")
 
