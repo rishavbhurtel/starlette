@@ -32,7 +32,7 @@ def get_item(table_name, item_type, item_id):
 
 def get_info(info_id):
     db, metadata = get_db()
-    infos_table = Table('posts', metadata, autoload=True, autoload_with=db)
+    infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
     sql = select([infos_table]).where(infos_table.c.id == info_id)
 
     info = db.execute(sql).fetchone()
