@@ -8,9 +8,9 @@ def create_info_table():
 
     infos = Table(
         'infos', meta,
-        Column('Id', Integer, primary_key=True),
-        Column('Name', Text),
-        Column('Address', Text)
+        Column('id', Integer, primary_key=True),
+        Column('name', Text),
+        Column('address', Text)
     )
     meta.create_all(engine)
 
