@@ -8,12 +8,19 @@
       <p>This is a Test file</p>
       <p>Today's Date is: {{date}}</p>
 
+      <table>
+        <tr>
+          <th>Name</th>
+        </tr>
+        <tr>
       {% for i in infos %}
-
-        <strong>ID:</strong> {{ i.id }}
-        <strong>Name:</strong> {{ i.name }}
+        <!-- <strong>ID:</strong> {{ i.id }} -->
+        <td><a href="/info/{{i.id}}"> {{ i.name }} </a></td>
         <!-- <strong>Address:</strong> {{ i.address }} -->
-      {% endfor %}
+      </tr>
+      {%- endfor -%}
+
+      </table>
 
       <p><a class="btn btn-primary btn-lg" href="https://codavatar.com/" role="button">Learn more &raquo;</a></p>
     </div>
