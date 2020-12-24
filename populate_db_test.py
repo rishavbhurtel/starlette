@@ -2,6 +2,7 @@ from faker import Faker
 from random import randint
 from sqlalchemy import create_engine
 import json
+
 fake = Faker()
 DB_PATH = 'sqlite.db'
 

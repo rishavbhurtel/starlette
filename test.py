@@ -1,6 +1,6 @@
 import uvicorn
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse, PlainTextResponse
+from starlette.responses import JSONResponse, PlainTextResponse, RedirectResponse
 from starlette.routing import Route
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
@@ -35,7 +35,7 @@ def get_info(info_id):
     infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
     sql = select([infos_table]).where(infos_table.c.id == info_id)
 
-    info = db.execute(sql)
+    info = db.execute(sql).fetchone()
 
     if info:
         return info
@@ -52,18 +52,37 @@ async def homepage(request):
 
 async def info(request):
     if request.path_params:
-        user_id = request.path_params['user_id']
-        r_infos = get_info(user_id)
+        info_id = request.path_params['info_id']
+        r_infos = get_info(info_id)
         #return JSONResponse({'Name': "Rishav", "Id": user_id, "Address": "Kathmandu"})
         return templates.TemplateResponse('info.html',{'request':request,
                                                         'infos': r_infos})
     else:
         return PlainTextResponse("No parameter. Please Enter Id number")
 
+async def add(request):
+    return templates.TemplateResponse('add.html',{'request':request})
+
+async def delete(request):
+    if request.path_params:
+        info_id = request.path_params['info_id']
+        db, metadata = get_db()
+        infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
+        sql = infos_table.delete().where(infos_table.c.id == info_id)
+        db.execute(sql)
+        response = RedirectResponse(url='/')
+        return response
+
+    else:
+        return PlainTextResponse("No parameter. Please Enter Id number")
+
+
 routes = [  
     Route('/', homepage),
-    Route('/info/{user_id:int}', endpoint=info),
-    Route("/info", endpoint=info)
+    Route('/info/{info_id:int}', endpoint=info),
+    Route("/info", endpoint=info),
+    Route("/add", endpoint=add),
+    Route("/delete/{info_id:int}", endpoint=delete)
 ]
 
 app = Starlette(debug=True, routes=routes)
