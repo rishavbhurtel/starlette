@@ -60,10 +60,8 @@ async def info(request):
     else:
         return PlainTextResponse("No parameter. Please Enter Id number")
 
-async def add(request):
-    return templates.TemplateResponse('add.html',{'request':request})
 
-async def delete(request):
+async def delete_info(request):
     if request.path_params:
         info_id = request.path_params['info_id']
         db, metadata = get_db()
@@ -74,7 +72,10 @@ async def delete(request):
         return response
 
     else:
-        return PlainTextResponse("No parameter. Please Enter Id number")
+        return PlainTextResponse("No parameter.")
+
+async def add(request):
+    return templates.TemplateResponse('add.html',{'request':request})
 
 async def add_info(id, name, address):
     db, metadata = get_db()
@@ -84,13 +85,27 @@ async def add_info(id, name, address):
     response = RedirectResponse(url='/')
     return response
 
+async def update(request):
+    info_id = request.path_params['info_id']
+    info = get_info(info_id)
+    return templates.TemplateResponse('update.html',{'request':request, 'info': info})
+
+async def update_info(id, name, address):
+    db, metadata = get_db()
+    infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
+    sql = infos_table.update().values(id = id, name = name, address = address)
+    db.execute(sql)
+    response = RedirectResponse(url='/')
+    return response
+
 routes = [  
     Route('/', homepage),
     Route('/info/{info_id:int}', endpoint=info),
     Route("/info", endpoint=info),
-    Route("/add", endpoint=add),
-    Route("/delete/{info_id:int}", endpoint=delete)
-]
+    Route("/add", endpoint=add, methods=["GET","POST"]),
+    Route("/edit/{info_id:int}", endpoint=update, methods=["GET","POST"]),
+    Route("/delete/{info_id:int}", endpoint=delete_info)
+]   
 
 app = Starlette(debug=True, routes=routes)
 app.mount('/static', StaticFiles(directory='statics'), name='static')

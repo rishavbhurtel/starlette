@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+    form{
+        padding-top: 3%;
+    }
+</style>
+</div>
+    <form class="form-inline my-2 my-lg-0">
+        <input class="form-control mr-sm-2" type="text" placeholder="{{info.id}}" aria-label="id">
+        <input class="form-control mr-sm-2" type="text" placeholder="{{info.name}}" aria-label="name">
+        <input class="form-control mr-sm-2" type="text" placeholder="{{info.address}}" aria-label="address">
+        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Add</button>
+    </form>
+</div>
+
+{%endblock%}
