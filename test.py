@@ -76,6 +76,13 @@ async def delete(request):
     else:
         return PlainTextResponse("No parameter. Please Enter Id number")
 
+async def add_info(id, name, address):
+    db, metadata = get_db()
+    infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
+    sql = infos_table.insert().values(id = id, name = name, address = address)
+    db.execute(sql)
+    response = RedirectResponse(url='/')
+    return response
 
 routes = [  
     Route('/', homepage),
