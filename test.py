@@ -76,21 +76,19 @@ async def delete_info(request):
 
 async def add(request):
     if request.method == "POST":
-        data = request.body.json()
+        print("Add Request!")
+        data = await request.json()
         id = data['id']
         name = data['name']
         address = data['address']
-        add_info(id, name, address)
+        db, metadata = get_db()
+        infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
+        sql = infos_table.insert().values(id = id, name = name, address = address)
+        db.execute(sql)
+        response = RedirectResponse(url='/')
+        return response
     if request.method == "GET":
         return templates.TemplateResponse('add.html',{'request':request})
-
-async def add_info(id, name, address):
-    db, metadata = get_db()
-    infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
-    sql = infos_table.insert().values(id = id, name = name, address = address)
-    db.execute(sql)
-    response = RedirectResponse(url='/')
-    return response
 
 async def update(request):
     info_id = request.path_params['info_id']
