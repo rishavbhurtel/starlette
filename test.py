@@ -1,6 +1,6 @@
 import uvicorn
 from starlette.applications import Starlette
-from starlette.responses import JSONResponse, PlainTextResponse, RedirectResponse
+from starlette.responses import Response, PlainTextResponse, RedirectResponse
 from starlette.routing import Route
 from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
@@ -75,7 +75,14 @@ async def delete_info(request):
         return PlainTextResponse("No parameter.")
 
 async def add(request):
-    return templates.TemplateResponse('add.html',{'request':request})
+    if request.method == "POST":
+        data = request.body.json()
+        id = data['id']
+        name = data['name']
+        address = data['address']
+        add_info(id, name, address)
+    if request.method == "GET":
+        return templates.TemplateResponse('add.html',{'request':request})
 
 async def add_info(id, name, address):
     db, metadata = get_db()

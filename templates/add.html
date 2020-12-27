@@ -7,12 +7,68 @@
     }
 </style>
 </div>
-    <form class="form-inline my-2 my-lg-0">
-        <input class="form-control mr-sm-2" type="text" placeholder="Id:" aria-label="id">
-        <input class="form-control mr-sm-2" type="text" placeholder="Name:" aria-label="name">
-        <input class="form-control mr-sm-2" type="text" placeholder="Address:" aria-label="address">
-        <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Add</button>
+    <form action="http://0.0.0.0:8000/add" id = "info-form" method="POST">
+        <label for="id">
+            <strong>Id:</strong>
+            <input type="text" name='id' placeholder='Id' id='id'>
+        </label>
+        <label for="name">
+            <strong>Name:</strong>
+            <input type="text" name='name' placeholder='Name' id='name'>
+        </label>
+        <label for="address">
+            <strong>Address:</strong>
+            <input type="text" name='address' placeholder='Address' id='address'>
+        </label>
+
+        <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Add"
     </form>
 </div>
+
+<script>    
+    async function postFormDataAsJson({url, formData}){
+        const plainFormData = Object.formEntries(formData.entries());
+        const formDataJsonString = JSON.stringify(plainFormData);
+    
+        const fetchOptions = {
+            method: "POST",
+            headers : {
+                "Content-Type": "application/json",
+                "Accept": "application/json"
+            },
+            body: formDataJsonString,
+        };
+    
+        const response = await fetch(url, fetchOptions);
+    
+        if(!response.ok){
+            const errorMessage = await response.text();
+            throw new Error(errorMessage);
+        }
+    
+        return response.json();
+    }
+
+    async function handleFormSubmit(event) {
+        event.preventDefault();
+        const form = event.currentTarget;
+        const url = form.action;
+    
+        try {
+            const formData = new FormData(form);
+            const responseData = await postFormDataAsJson({url, formData});
+    
+            console.log({responseData});
+        } catch(error){
+            console.error(error);
+        }
+    
+    }
+
+    const infoForm = document.getElementById("info-form");
+    
+    infoForm.addEventListener("submit", handleFormSubmit)
+
+</script>
 
 {%endblock%}
