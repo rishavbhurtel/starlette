@@ -10,14 +10,14 @@
     <form action="/edit/{{info.id}}" id="info-form" method="POST">
         <label for="name">
             <strong>Name:</strong>
-            <input type="text" name='name' placeholder='{{info.name}}' id='name'>
+            <input type="text" name='name' placeholder='{{info.name}}' id='name' required>
         </label>
         <label for="address">
             <strong>Address:</strong>
             <input type="text" name='address' placeholder='{{info.address}}' id='address'>
         </label>
 
-        <input type="submit" class="btn btn-outline-success my-2 my-sm-0" value="Add">
+        <input type="submit" value="Update" onClick="CloseAndRedirect()";>
     </form>
 </div>
 
@@ -30,7 +30,7 @@
             method: "POST",
             headers : {
                 "Content-Type": "application/json",
-                "Accept": "application/json"
+                "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8",
             },
             body: formDataJsonString,
         };
@@ -60,6 +60,11 @@
         }
     
     }
+
+    function CloseAndRedirect() 
+  {
+    setTimeout("location.href = '{{ url_for('homepage') }}';",1000);
+  }
 
     const infoForm = document.getElementById("info-form");
     

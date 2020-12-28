@@ -68,7 +68,7 @@ async def delete_info(request):
         infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
         sql = infos_table.delete().where(infos_table.c.id == info_id)
         db.execute(sql)
-        response = RedirectResponse(url='/')
+        response = RedirectResponse(url='/', status_code=303)
         return response
 
     else:
@@ -84,30 +84,31 @@ async def add(request):
         db, metadata = get_db()
         infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
         sql = infos_table.insert().values(id = id, name = name, address = address)
-        db.execute(sql)
-        response = RedirectResponse(url='/', status_code=307)
-        return response
-    if request.method == "GET":
+        return db.execute(sql)
+    if request.method == "GET": 
         return templates.TemplateResponse('add.html',{'request':request})
 
 async def update(request):
-    if request.method == "POST":
-        print("Updating!")
-        id = request.path_params['info_id']
-        data = await request.json()
-        name = data['name']
-        address = data['address']
-        db, metadata = get_db()
-        infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
-        sql = infos_table.update().where(infos_table.c.id==id).values(name = name, address = address)
-        db.execute(sql)
-        response = RedirectResponse(url='/')
-        return response 
-    if request.method == "GET":
-        info_id = request.path_params['info_id']
-        info = get_info(info_id)
-        return templates.TemplateResponse('update.html',{'request':request, 'info': info})
+    if request.path_params:
+        if request.method == "POST":
+            print("Updating!")
+            id = request.path_params['info_id']
+            data = await request.json()
+            name = data['name']
+            address = data['address']
+            db, metadata = get_db()
+            infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
+            sql = infos_table.update().where(infos_table.c.id==id).values(name = name, address = address)
+            return db.execute(sql)
+            # response = RedirectResponse(url='/', status_code=303)
+            # return response 
+        if request.method == "GET":
+            info_id = request.path_params['info_id']
+            info = get_info(info_id)
+            return templates.TemplateResponse('update.html',{'request':request, 'info': info})
     
+    else:
+        return PlainTextResponse("No parameter.")
 
 routes = [  
     Route('/', homepage),

@@ -7,15 +7,22 @@
       <h2>Hello, Rishav!</h2>
       <p>Today's Date is: {{date}}</p>
       <p><a class="btn btn-success btn-sm" href="/add" role="button">Add</a></p>
+
+      <style>
+        th{
+          width: 50%;
+        }
+      </style>
+
       <table>
         <tr>
+          <th>ID</th>
           <th>Name</th>
         </tr>
         <tr>
       {% for i in infos %}
-        <!-- <strong>ID:</strong> {{ i.id }} -->
+        <td><strong></strong> {{ i.id }} </td>
         <td><a href="/info/{{i.id}}"> {{ i.name }} </a></td>
-        <!-- <strong>Address:</strong> {{ i.address }} -->
       </tr>
       {%- endfor -%}
 
