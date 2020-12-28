@@ -85,23 +85,29 @@ async def add(request):
         infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
         sql = infos_table.insert().values(id = id, name = name, address = address)
         db.execute(sql)
-        response = RedirectResponse(url='/')
+        response = RedirectResponse(url='/', status_code=307)
         return response
     if request.method == "GET":
         return templates.TemplateResponse('add.html',{'request':request})
 
 async def update(request):
-    info_id = request.path_params['info_id']
-    info = get_info(info_id)
-    return templates.TemplateResponse('update.html',{'request':request, 'info': info})
-
-async def update_info(id, name, address):
-    db, metadata = get_db()
-    infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
-    sql = infos_table.update().values(id = id, name = name, address = address)
-    db.execute(sql)
-    response = RedirectResponse(url='/')
-    return response
+    if request.method == "POST":
+        print("Updating!")
+        id = request.path_params['info_id']
+        data = await request.json()
+        name = data['name']
+        address = data['address']
+        db, metadata = get_db()
+        infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
+        sql = infos_table.update().where(infos_table.c.id==id).values(name = name, address = address)
+        db.execute(sql)
+        response = RedirectResponse(url='/')
+        return response 
+    if request.method == "GET":
+        info_id = request.path_params['info_id']
+        info = get_info(info_id)
+        return templates.TemplateResponse('update.html',{'request':request, 'info': info})
+    
 
 routes = [  
     Route('/', homepage),
