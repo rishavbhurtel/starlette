@@ -84,7 +84,8 @@ async def add(request):
         db, metadata = get_db()
         infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
         sql = infos_table.insert().values(id = id, name = name, address = address)
-        return db.execute(sql)
+        db.execute(sql)
+        return PlainTextResponse("Success")
     if request.method == "GET": 
         return templates.TemplateResponse('add.html',{'request':request})
 
@@ -99,7 +100,8 @@ async def update(request):
             db, metadata = get_db()
             infos_table = Table('infos', metadata, autoload=True, autoload_with=db)
             sql = infos_table.update().where(infos_table.c.id==id).values(name = name, address = address)
-            return db.execute(sql)
+            db.execute(sql)
+            return PlainTextResponse("Success")
             # response = RedirectResponse(url='/', status_code=303)
             # return response 
         if request.method == "GET":
