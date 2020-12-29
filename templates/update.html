@@ -17,7 +17,7 @@
             <input type="text" name='address' placeholder='{{info.address}}' id='address'>
         </label>
 
-        <input type="submit" value="Update" onClick="CloseAndRedirect()";>
+        <input type="submit" value="Update";>
     </form>
 </div>
 
@@ -42,7 +42,8 @@
             throw new Error(errorMessage);
         }
     
-        return response.json();
+        // return response.json();
+        return response.text();
     }
 
     async function handleFormSubmit(event) {
@@ -55,16 +56,14 @@
             const responseData = await postFormDataAsJson({url, formData});
     
             console.log({responseData});
+            if ( responseData == 'Success'){
+                setTimeout("location.href = '{{ url_for('homepage') }}';",500);
+            }
         } catch(error){
             console.error(error);
         }
     
     }
-
-    function CloseAndRedirect() 
-  {
-    setTimeout("location.href = '{{ url_for('homepage') }}';",1000);
-  }
 
     const infoForm = document.getElementById("info-form");
     
