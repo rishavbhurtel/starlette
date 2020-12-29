@@ -20,6 +20,7 @@
         <input type="submit" value="Update";>
     </form>
 </div>
+<div id="popUp" style="display: none;"> Info Updated! </div>
 
 <script>    
     async function postFormDataAsJson({url, formData}){
@@ -57,7 +58,11 @@
     
             console.log({responseData});
             if ( responseData == 'Success'){
-                setTimeout("location.href = '{{ url_for('homepage') }}';",500);
+                $( "#popUp" ).show(); 
+                    setTimeout(function() {
+                    $( "#popUp" ).hide();
+                    }, 1000);
+                setTimeout("location.href = '{{ url_for('homepage') }}';",1000);
             }
         } catch(error){
             console.error(error);
