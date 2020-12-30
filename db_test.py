@@ -3,12 +3,10 @@ from random import randint
 from sqlalchemy import create_engine, MetaData, Table, Column, Integer, Text
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from models import Info
+from models import Info, Base
 from config import DB_PATH
 
 fake = Faker()
-Base = declarative_base()
-
 engine = create_engine(DB_PATH)
 Session = sessionmaker(bind=engine)
 
@@ -48,6 +46,7 @@ def recreate_database():
 if __name__ == '__main__':
     s = Session()
     s.close_all()
+    recreate_database()
     datas = [data() for _ in range(10)]
     print(f'Adding {len(datas)} info to db.')
     populate_info(datas)
