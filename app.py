@@ -8,8 +8,8 @@ from starlette.staticfiles import StaticFiles
 from starlette.templating import Jinja2Templates
 from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
-from models import Info
-from config import DB_PATH
+from db.models import Info
+from db.config import DB_PATH
 
 Base = declarative_base()
 
@@ -91,4 +91,4 @@ routes = [
 app = Starlette(debug=True, routes=routes)
 app.mount('/static', StaticFiles(directory='statics'), name='static')
 if __name__ == "__main__":
-    uvicorn.run('test:app', host='0.0.0.0', port=8000, reload=True)
+    uvicorn.run('app:app', host='0.0.0.0', port=8000, reload=True)

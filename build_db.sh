@@ -1,2 +1,2 @@
-python3 db_test.py
-python3 test.py
+python3 db/db.py
+python3 app.py
