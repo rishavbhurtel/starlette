@@ -10,103 +10,114 @@ from sqlalchemy.ext.declarative import declarative_base
 from sqlalchemy.orm import sessionmaker
 from db.models import Info
 from db.config import DB_PATH
+from contextlib import contextmanager
 
 Base = declarative_base()
 
 engine = create_engine(DB_PATH)
 Base.metadata.create_all(engine)
 Session = sessionmaker(bind=engine)
-s = Session()
 templates = Jinja2Templates(directory="templates")
 
 
+@contextmanager
+def session_scope():
+    session = Session()
+    try:
+        yield session
+        session.commit()
+    except Exception:
+        session.rollback()
+        raise
+    finally:
+        session.close()
+
+
 async def homepage(request):
-    r_infos = s.query(Info).order_by(Info.id.asc()).all()
-    s.close()
-    return templates.TemplateResponse(
-        "index.html",
-        {
-            "request": request,
-            "date": (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
-            "infos": r_infos,
-        },
-    )
+    with session_scope() as s:
+        r_infos = s.query(Info).order_by(Info.id.asc()).all()
+        return templates.TemplateResponse(
+            "index.html",
+            {
+                "request": request,
+                "date": (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
+                "infos": r_infos,
+            },
+        )
 
 
 async def info(request):
-    if request.path_params:
-        info_id = request.path_params["info_id"]
-        r_infos = s.query(Info).filter_by(id=info_id).first()
-        # return JSONResponse({'Name': "Rishav", "Id": user_id, "Address": "Kathmandu"})
-        return templates.TemplateResponse(
-            "info.html", {"request": request, "infos": r_infos}
-        )
-    else:
-        return PlainTextResponse("No parameter. Please Enter Id number")
+    with session_scope() as s:
+        if request.path_params:
+            info_id = request.path_params["info_id"]
+            r_infos = s.query(Info).filter_by(id=info_id).first()
+            # return JSONResponse({'Name': "Rishav", "Id": user_id, "Address": "Kathmandu"})
+            return templates.TemplateResponse(
+                "info.html", {"request": request, "infos": r_infos}
+            )
+        else:
+            return PlainTextResponse("No parameter. Please Enter Id number")
 
 
 async def delete(request):
-    if request.path_params:
-        info_id = request.path_params["info_id"]
-        s.query(Info).filter_by(id=info_id).delete()
-        s.commit()
-        s.close()
-        response = RedirectResponse(url="/", status_code=303)
-        return response
-    else:
-        return PlainTextResponse("No parameter.")
+    with session_scope() as s:
+        if request.path_params:
+            info_id = request.path_params["info_id"]
+            s.query(Info).filter_by(id=info_id).delete()
+            response = RedirectResponse(url="/", status_code=303)
+            return response
+        else:
+            return PlainTextResponse("No parameter.")
 
 
-async def add(request):
-    if request.method == "POST":
-        print("Add Request!")
-        data = await request.json()
-        id, name, address, date = (
-            data["id"],
-            data["name"],
-            data["address"],
-            (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
-        )
-        s.add(Info(id=id, name=name, address=address, date=date))
-        s.commit()
-        s.close()
-        return PlainTextResponse("Success")
-    if request.method == "GET":
-        return templates.TemplateResponse("add.html", {"request": request})
+async def add(request):  # duplicate id error handling remaining
+    with session_scope() as s:
+        if request.method == "POST":
+            print("Add Request!")
+            data = await request.json()
+            id, name, address, date = (
+                data["id"],
+                data["name"],
+                data["address"],
+                (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
+            )
+            s.add(Info(id=id, name=name, address=address, date=date))
+            return PlainTextResponse("Success")
+        if request.method == "GET":
+            return templates.TemplateResponse("add.html", {"request": request})
 
 
 async def update(request):
-    if request.path_params:
-        if request.method == "POST":
-            print("Updating!")
-            id = request.path_params["info_id"]
-            data = await request.json()
-            if data["name"] == "":
-                data["name"] = (s.query(Info).filter_by(id=id).first()).name
-            if data["address"] == "":
-                data["address"] = (s.query(Info).filter_by(id=id).first()).address
-            if data["name"] != "" and data["address"] != "":
-                name, address, date = (
-                    data["name"],
-                    data["address"],
-                    (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
+    with session_scope() as s:
+        if request.path_params:
+            if request.method == "POST":
+                print("Updating!")
+                id = request.path_params["info_id"]
+                data = await request.json()
+                if data["name"] == "":
+                    data["name"] = (s.query(Info).filter_by(id=id).first()).name
+                if data["address"] == "":
+                    data["address"] = (s.query(Info).filter_by(id=id).first()).address
+                if data["name"] != "" and data["address"] != "":
+                    name, address, date = (
+                        data["name"],
+                        data["address"],
+                        (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
+                    )
+                    s.query(Info).filter_by(id=id).update(
+                        {"id": id, "name": name, "address": address, "date": date}
+                    )
+                    return PlainTextResponse("Success")
+                    # response = RedirectResponse(url='/', status_code=303)
+                    # return response
+            if request.method == "GET":
+                info_id = request.path_params["info_id"]
+                info = s.query(Info).filter_by(id=info_id).first()
+                return templates.TemplateResponse(
+                    "update.html", {"request": request, "info": info}
                 )
-                s.query(Info).filter_by(id=id).update(
-                    {"id": id, "name": name, "address": address, "date": date}
-                )
-                s.commit()
-                s.close()
-                return PlainTextResponse("Success")
-                # response = RedirectResponse(url='/', status_code=303)
-                # return response
-        if request.method == "GET":
-            info_id = request.path_params["info_id"]
-            info = s.query(Info).filter_by(id=info_id).first()
-            return templates.TemplateResponse(
-                "update.html", {"request": request, "info": info}
-            )
-    else:
-        return PlainTextResponse("No parameter.")
+        else:
+            return PlainTextResponse("No parameter.")
 
 
 routes = [

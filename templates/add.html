@@ -21,15 +21,15 @@
             <input type="text" name='address' placeholder='Address' id='address' required>
         </label>
 
-        <input type="submit" value="Add">
+        <input class="btn btn-success" type="submit" value="Add">
     </form>
 </div>
 <div id="popUp" style="display: none;"> Info Added! </div>
-<script>    
+<script>
     async function postFormDataAsJson({url, formData}){
         const plainFormData = Object.fromEntries(formData.entries());
         const formDataJsonString = JSON.stringify(plainFormData);
-    
+
         const fetchOptions = {
             method: "POST",
             headers : {
@@ -38,14 +38,14 @@
             },
             body: formDataJsonString,
         };
-    
+
         const response = await fetch(url, fetchOptions);
-    
+
         if(!response.ok){
             const errorMessage = await response.text();
             throw new Error(errorMessage);
         }
-    
+
         return response.text();
     }
 
@@ -53,14 +53,14 @@
         event.preventDefault();
         const form = event.currentTarget;
         const url = form.action;
-    
+
         try {
             const formData = new FormData(form);
             const responseData = await postFormDataAsJson({url, formData});
-    
+
             console.log({responseData});
             if ( responseData == 'Success'){
-                $( "#popUp" ).show(); 
+                $( "#popUp" ).show();
                     setTimeout(function() {
                     $( "#popUp" ).hide();
                     }, 1000);
@@ -69,11 +69,11 @@
         } catch(error){
             console.error(error);
         }
-    
+
     }
 
     const infoForm = document.getElementById("info-form");
-    
+
     infoForm.addEventListener("submit", handleFormSubmit)
 
 
