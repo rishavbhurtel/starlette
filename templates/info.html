@@ -4,8 +4,8 @@
 <main role="main">
   <div class="jumbotron">
     <div class="container">
-      <h3><u>Information</u></h3> 
-      <p><a class="btn btn-danger btn-sm" href="/delete/{{infos.id}}" role="button">Delete</a> 
+      <h3><u>Information</u></h3>
+      <p><a class="btn btn-danger btn-sm" href="/delete/{{infos.id}}" role="button">Delete</a>
         <a class="btn btn-primary btn-sm" href="/edit/{{infos.id}}" role="button">Edit</a></p>
       <style>
         th, td {
@@ -19,13 +19,15 @@
           <th>Id</th>
           <th>Name</th>
           <th>Address</th>
+          <th>Updated on</th>
         </tr>
         <tr>
         <td>{{ infos.id }}</td>
         <td>{{ infos.name }}</td>
         <td>{{ infos.address }}</td>
+        <td>{{ infos.date }}</td>
       </tr>
-      
+
       </table>
     </div>
   </div>

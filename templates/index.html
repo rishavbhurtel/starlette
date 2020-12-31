@@ -10,7 +10,7 @@
 
       <style>
         th{
-          width: 50%;
+          width: 20%;
         }
       </style>
 
@@ -18,11 +18,13 @@
         <tr>
           <th>ID</th>
           <th>Name</th>
+          <th>Updated on</th>
         </tr>
         <tr>
       {% for i in infos %}
-        <td><strong></strong> {{ i.id }} </td>
+        <td>{{ i.id }}</td>
         <td><a href="/info/{{i.id}}"> {{ i.name }} </a></td>
+        <td>{{i.date}}</td>
       </tr>
       {%- endfor -%}
 

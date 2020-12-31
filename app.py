@@ -61,8 +61,13 @@ async def add(request):
     if request.method == "POST":
         print("Add Request!")
         data = await request.json()
-        id, name, address = data["id"], data["name"], data["address"]
-        s.add(Info(id=id, name=name, address=address))
+        id, name, address, date = (
+            data["id"],
+            data["name"],
+            data["address"],
+            (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
+        )
+        s.add(Info(id=id, name=name, address=address, date=date))
         s.commit()
         s.close()
         return PlainTextResponse("Success")
@@ -76,15 +81,24 @@ async def update(request):
             print("Updating!")
             id = request.path_params["info_id"]
             data = await request.json()
-            name, address = data["name"], data["address"]
-            s.query(Info).filter_by(id=id).update(
-                {"id": id, "name": name, "address": address}
-            )
-            s.commit()
-            s.close()
-            return PlainTextResponse("Success")
-            # response = RedirectResponse(url='/', status_code=303)
-            # return response
+            if data["name"] == "":
+                data["name"] = (s.query(Info).filter_by(id=id).first()).name
+            if data["address"] == "":
+                data["address"] = (s.query(Info).filter_by(id=id).first()).address
+            if data["name"] != "" and data["address"] != "":
+                name, address, date = (
+                    data["name"],
+                    data["address"],
+                    (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
+                )
+                s.query(Info).filter_by(id=id).update(
+                    {"id": id, "name": name, "address": address, "date": date}
+                )
+                s.commit()
+                s.close()
+                return PlainTextResponse("Success")
+                # response = RedirectResponse(url='/', status_code=303)
+                # return response
         if request.method == "GET":
             info_id = request.path_params["info_id"]
             info = s.query(Info).filter_by(id=info_id).first()

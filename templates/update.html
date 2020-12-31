@@ -10,7 +10,7 @@
     <form action="/edit/{{info.id}}" id="info-form" method="POST">
         <label for="name">
             <strong>Name:</strong>
-            <input type="text" name='name' placeholder='{{info.name}}' id='name' required>
+            <input type="text" name='name' placeholder='{{info.name}}' id='name'>
         </label>
         <label for="address">
             <strong>Address:</strong>
@@ -22,11 +22,11 @@
 </div>
 <div id="popUp" style="display: none;"> Info Updated! </div>
 
-<script>    
+<script>
     async function postFormDataAsJson({url, formData}){
         const plainFormData = Object.fromEntries(formData.entries());
         const formDataJsonString = JSON.stringify(plainFormData);
-    
+
         const fetchOptions = {
             method: "POST",
             headers : {
@@ -35,14 +35,14 @@
             },
             body: formDataJsonString,
         };
-    
+
         const response = await fetch(url, fetchOptions);
-    
+
         if(!response.ok){
             const errorMessage = await response.text();
             throw new Error(errorMessage);
         }
-    
+
         // return response.json();
         return response.text();
     }
@@ -51,14 +51,14 @@
         event.preventDefault();
         const form = event.currentTarget;
         const url = form.action;
-    
+
         try {
             const formData = new FormData(form);
             const responseData = await postFormDataAsJson({url, formData});
-    
+
             console.log({responseData});
             if ( responseData == 'Success'){
-                $( "#popUp" ).show(); 
+                $( "#popUp" ).show();
                     setTimeout(function() {
                     $( "#popUp" ).hide();
                     }, 1000);
@@ -67,11 +67,11 @@
         } catch(error){
             console.error(error);
         }
-    
+
     }
 
     const infoForm = document.getElementById("info-form");
-    
+
     infoForm.addEventListener("submit", handleFormSubmit)
 
 </script>
