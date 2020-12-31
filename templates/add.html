@@ -25,6 +25,7 @@
     </form>
 </div>
 <div id="popUp" style="display: none;"> Info Added! </div>
+<div id="popUp2" style="display: none;"> Cannot Add. Same ID already exist! </div>
 <script>
     async function postFormDataAsJson({url, formData}){
         const plainFormData = Object.fromEntries(formData.entries());
@@ -67,6 +68,13 @@
                 setTimeout("location.href = '{{ url_for('homepage') }}';",1000);
             }
         } catch(error){
+            if ( responseData == 'Same'){
+                $( "#popUp2" ).show();
+                    setTimeout(function() {
+                    $( "#popUp" ).hide();
+                    }, 3000);
+                // setTimeout("location.href = '{{ url_for('homepage') }}';",1000);
+            }
             console.error(error);
         }
 

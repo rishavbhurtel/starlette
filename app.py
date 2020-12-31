@@ -81,8 +81,11 @@ async def add(request):  # duplicate id error handling remaining
                 data["address"],
                 (datetime.now()).strftime("%Y-%b-%d, %H:%M:%S"),
             )
-            s.add(Info(id=id, name=name, address=address, date=date))
-            return PlainTextResponse("Success")
+            try:
+                s.add(Info(id=id, name=name, address=address, date=date))
+                return PlainTextResponse("Success")
+            except:  # IntegrityError not working
+                return PlainTextResponse("Same")
         if request.method == "GET":
             return templates.TemplateResponse("add.html", {"request": request})
 
